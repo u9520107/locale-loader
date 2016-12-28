@@ -1,0 +1,38 @@
+{
+  "name": "locale-loader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/u9520107/locale-loader.git"
+  },
+  "author": "Jack Tzu-Chieh Huang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/u9520107/locale-loader/issues"
+  },
+  "homepage": "https://github.com/u9520107/locale-loader#readme",
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-eslint": "^7.1.1",
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "eslint": "^3.12.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0"
+  },
+  "peerDependencies": {
+    "babel-runtime": "^6.20.0"
+  },
+  "dependencies": {
+    "dedent": "^0.6.0",
+    "fs-promise": "^1.0.0"
+  }
+}
