@@ -1,9 +1,8 @@
 import fs from 'fs-promise';
 import generateLoader from './generateLoader';
 import isLocaleFile from './isLocaleFile';
-
-const loaderRegExp = /\/\* ?loadLocale.*?\*\//;
-const noChunkRegExp = /\/\* ?loadLocale.*?noChunk.*?\*\//;
+import loaderRegExp from './loaderRegExp';
+import noChunkRegExp from './noChunkRegExp';
 
 module.exports = function localeLoader(content) {
   const callback = this.async();
