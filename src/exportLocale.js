@@ -1,9 +1,7 @@
-// import through from 'through2';
 import fs from 'fs-promise';
 import path from 'path';
 import glob from 'glob';
-const babylon = require('babylon'); // for some reason, import syntax result in undefined
-
+import { parse, tokTypes } from 'babylon';
 import isLocaleFile from './isLocaleFile';
 // import generateLoader from './generateLoader';
 import loaderRegExp from './loaderRegExp';
@@ -32,7 +30,7 @@ function parseLine(tokens, startingIdx) {
     keyArray.push(token.value || token.type.label);
     idx += 1;
     token = tokens[idx];
-  } while (token.type !== babylon.tokTypes.colon);
+  } while (token.type !== tokTypes.colon);
   return [{
     key: keyArray.join(''),
     value: tokens[idx + 1].value,
@@ -41,7 +39,7 @@ function parseLine(tokens, startingIdx) {
 
 async function extractData(localeFile) {
   const content = await fs.readFile(localeFile, 'utf8');
-  const parsed = babylon.parse(content, { sourceType: 'module' });
+  const parsed = parse(content, { sourceType: 'module' });
   let idx = 0;
   const len = parsed.tokens.length;
   let capturing = false;
@@ -49,14 +47,14 @@ async function extractData(localeFile) {
   while (idx < len) {
     const token = parsed.tokens[idx];
     if (
-      token.type === babylon.tokTypes._export &&
-      parsed.tokens[idx + 1].type === babylon.tokTypes._default &&
-      parsed.tokens[idx + 2].type === babylon.tokTypes.braceL
+      token.type === tokTypes._export &&
+      parsed.tokens[idx + 1].type === tokTypes._default &&
+      parsed.tokens[idx + 2].type === tokTypes.braceL
     ) {
       capturing = true;
       idx += 3;
     } else if (capturing) {
-      if (token.type === babylon.tokTypes.braceR) {
+      if (token.type === tokTypes.braceR) {
         break;
       } else {
         const [item, newIdx] = parseLine(parsed.tokens, idx);
@@ -133,7 +131,7 @@ export default async function exportLocale({
   // const localeData = {}};
   // await Promise.all([...localeFiles].map(async (file) => {
   //   const content = await fs.readFile(file, 'utf8');
-  //   const parsed = babylon.parse(content, { sourceType: 'module' });
+  //   const parsed = parse(content, { sourceType: 'module' });
   //   let idx = 0;
   //   const len = parsed.tokens.length;
   //   let capturing = false;
@@ -141,14 +139,14 @@ export default async function exportLocale({
   //   while (idx < len) {
   //     const token = parsed.tokens[idx];
   //     if (
-  //       token.type === babylon.tokTypes._export &&
-  //       parsed.tokens[idx + 1].type === babylon.tokTypes._default &&
-  //       parsed.tokens[idx + 2].type === babylon.tokTypes.braceL
+  //       token.type === tokTypes._export &&
+  //       parsed.tokens[idx + 1].type === tokTypes._default &&
+  //       parsed.tokens[idx + 2].type === tokTypes.braceL
   //     ) {
   //       capturing = true;
   //       idx += 3;
   //     } else if (capturing) {
-  //       if (token.type === babylon.tokTypes.braceR) {
+  //       if (token.type === tokTypes.braceR) {
   //         break;
   //       } else {
   //         const [item, newIdx] = parseLine(parsed.tokens, idx);
