@@ -3,9 +3,7 @@ import path from 'path';
 import glob from 'glob';
 import { parse, tokTypes } from 'babylon';
 import isLocaleFile from './isLocaleFile';
-// import generateLoader from './generateLoader';
 import loaderRegExp from './loaderRegExp';
-// import noChunkRegExp from './noChunkRegExp';
 import formatLocale from './formatLocale';
 
 
@@ -75,27 +73,28 @@ async function getLocaleData({ folderPath, sourceLocale, supportedLocales }) {
   const localeFiles = (await fs.readdir(folderPath)).filter(isLocaleFile);
   const localeData = {
     path: folderPath,
-    data: {},
+    files: [],
   };
   await Promise.all(localeFiles.map(async (file) => {
     const locale = formatLocale(file.replace(/\.(js|json)$/i, ''));
     if (locale === sourceLocale || supportedLocales.indexOf(locale) > -1) {
-      localeData.data[locale] = {
+      localeData.files.push({
         file,
         locale,
-        data: await extractData(path.resolve(folderPath, file)),
-      };
+        ...(await extractData(path.resolve(folderPath, file))),
+      });
     }
   }));
   return localeData;
 }
+
 async function getRawData({
   src,
   sourceLocale,
   supportedLocales,
 }) {
   const fileList = await new Promise((resolve, reject) => {
-    const g = new glob.Glob(src, (err, m) => {
+    glob(src, (err, m) => {
       if (err) {
         return reject(err);
       }
@@ -103,13 +102,22 @@ async function getRawData({
     });
   });
   const loaderFiles = await getLoaderFiles(fileList);
-  const rawData = {};
+  const rawData = [];
   await Promise.all(loaderFiles.map(async (f) => {
     const folderPath = path.dirname(f);
-    rawData[folderPath] = await getLocaleData({ folderPath, sourceLocale, supportedLocales });
+    rawData.push(await getLocaleData({ folderPath, sourceLocale, supportedLocales }));
   }));
-  console.log(JSON.stringify(rawData, null, 2));
+  return rawData;
 }
+
+
+
+
+function compileData(rawData) {
+  console.log(JSON.stringify(rawData, null, 2));
+
+}
+
 export default async function exportLocale({
   src = './src/**/*',
   dest = './build',
@@ -117,12 +125,17 @@ export default async function exportLocale({
   sourceLocale = 'en-US',
   supportedLocales = ['en-GB', 'en-CA', 'fr-FR', 'fr-CA', 'de-DE'],
 } = {}) {
-  const rawData = getRawData({
+  const rawData = await getRawData({
     src,
     sourceLocale,
     supportedLocales,
   });
-  console.log(JSON.stringify(rawData, null, 2));
+  console.log(compileData({
+    rawData,
+    sourceLocale,
+    supportedLocales,
+  }));
+
 
   // const folderPath = path.dirname(file);
   // const files = (await fs.readdir(folderPath)).filter(isLocaleFile);
