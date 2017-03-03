@@ -40,6 +40,8 @@
     "dedent": "^0.6.0",
     "fs-promise": "^1.0.0",
     "glob": "^7.1.1",
-    "through2": "^2.0.3"
+    "mkdirp-promise": "^5.0.1",
+    "through2": "^2.0.3",
+    "xml-js": "^1.0.2"
   }
 }
