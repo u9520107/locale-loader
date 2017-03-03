@@ -1,7 +1,10 @@
 import testVars from './testVars';
 
+const value = 'testValue';
 export default {
-  test: 'Test String',
-  test2: 'Test String 2',
+  test: 'Test "test" String',
+  test2: `${value}`,
+  test3: `hello
+  world`,
   [testVars.item]: 'Item',
 };

@@ -27,14 +27,31 @@ function parseLine(tokens, startingIdx) {
   let token = tokens[idx];
   const keyArray = [];
   do {
-    keyArray.push(token.value || token.type.label);
+    keyArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     idx += 1;
     token = tokens[idx];
   } while (token.type !== tokTypes.colon);
+  const valueArray = [];
+  idx += 1;
+  token = tokens[idx];
+  let isTemplate = false;
+  do {
+    if (
+      token.type === tokTypes.backQuote
+    ) {
+      isTemplate = true;
+    } else {
+      valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
+    }
+    idx += 1;
+    token = tokens[idx];
+  } while (token.type !== tokTypes.comma);
+  const value = JSON.stringify(valueArray.join(''));
   return [{
     key: keyArray.join(''),
-    value: tokens[idx + 1].value,
-  }, idx + 3];
+    value: value.substring(1, value.length - 1),
+    isTemplate,
+  }, idx + 1];
 }
 
 async function extractData(localeFile) {
@@ -58,7 +75,7 @@ async function extractData(localeFile) {
         break;
       } else {
         const [item, newIdx] = parseLine(parsed.tokens, idx);
-        data[item.key] = item.value;
+        data[item.key] = item;
         idx = newIdx;
       }
     } else {
@@ -174,12 +191,13 @@ async function exportXlf({
                 'trans-unit': missingKeys.map(key => ({
                   _attributes: {
                     id: `[${key}]`,
+                    template: sourceFile.data[key].isTemplate ? 'true' : 'false',
                   },
                   source: {
-                    _text: sourceFile.data[key],
+                    _text: sourceFile.data[key].value,
                   },
                   target: {
-                    _text: sourceFile.data[key],
+                    _text: sourceFile.data[key].value,
                   },
                 })),
               },
