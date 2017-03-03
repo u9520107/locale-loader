@@ -6,5 +6,5 @@ export default {
   test2: `${value}`,
   test3: `hello
   world`,
-  [testVars.item]: 'Item',
+  [testVars.item]: 'Item'
 };

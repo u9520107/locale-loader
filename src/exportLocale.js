@@ -35,23 +35,25 @@ function parseLine(tokens, startingIdx) {
   idx += 1;
   token = tokens[idx];
   let isTemplate = false;
+  let inTemplate = false;
   do {
     if (
       token.type === tokTypes.backQuote
     ) {
       isTemplate = true;
+      inTemplate = !inTemplate;
     } else {
       valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     }
     idx += 1;
     token = tokens[idx];
-  } while (token.type !== tokTypes.comma);
+  } while (token.type !== tokTypes.comma && (inTemplate || token.type !== tokTypes.braceR));
   const value = JSON.stringify(valueArray.join(''));
   return [{
     key: keyArray.join(''),
     value: value.substring(1, value.length - 1),
     isTemplate,
-  }, idx + 1];
+  }, token.type !== tokTypes.braceR ? idx + 1 : -1];
 }
 
 async function extractData(localeFile) {
@@ -61,7 +63,7 @@ async function extractData(localeFile) {
   const len = parsed.tokens.length;
   let capturing = false;
   const data = {};
-  while (idx < len) {
+  while (idx < len && idx !== -1) {
     const token = parsed.tokens[idx];
     if (
       token.type === tokTypes._export &&
