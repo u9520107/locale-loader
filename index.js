@@ -20,16 +20,21 @@ var _isLocaleFile = require('./isLocaleFile');
 
 var _isLocaleFile2 = _interopRequireDefault(_isLocaleFile);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _loaderRegExp = require('./loaderRegExp');
 
-var loaderRegExp = /\/\* ?loadLocale.*?\*\//;
-var noChunkRegExp = /\/\* ?loadLocale.*?noChunk.*?\*\//;
+var _loaderRegExp2 = _interopRequireDefault(_loaderRegExp);
+
+var _noChunkRegExp = require('./noChunkRegExp');
+
+var _noChunkRegExp2 = _interopRequireDefault(_noChunkRegExp);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 module.exports = function localeLoader(content) {
   var _this = this;
 
   var callback = this.async();
-  if (loaderRegExp.test(content)) {
+  if (_loaderRegExp2.default.test(content)) {
     (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
       var files;
       return _regenerator2.default.wrap(function _callee$(_context) {
@@ -48,7 +53,7 @@ module.exports = function localeLoader(content) {
 
               callback(null, (0, _generateLoader2.default)({
                 files: files,
-                chunk: !noChunkRegExp.test(content)
+                chunk: !_noChunkRegExp2.default.test(content)
               }));
 
             case 5:
@@ -62,4 +67,3 @@ module.exports = function localeLoader(content) {
     callback(null, content);
   }
 };
-//# sourceMappingURL=index.js.map

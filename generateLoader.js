@@ -39,4 +39,3 @@ function generateLoader(_ref) {
   });
   return (0, _dedent2.default)(_templateObject, cases.join(''));
 }
-//# sourceMappingURL=generateLoader.js.map
