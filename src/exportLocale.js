@@ -240,46 +240,4 @@ export default async function exportLocale({
     sourceLocale,
     supportedLocales,
   });
-  // console.log(compileData({
-  //   rawData,
-  //   sourceLocale,
-  //   supportedLocales,
-  // }));
-
-
-  // const folderPath = path.dirname(file);
-  // const files = (await fs.readdir(folderPath)).filter(isLocaleFile);
-  // localeFiles.add(...files.map(f => path.resolve(folderPath, f)));
-
-  // const localeData = {}};
-  // await Promise.all([...localeFiles].map(async (file) => {
-  //   const content = await fs.readFile(file, 'utf8');
-  //   const parsed = parse(content, { sourceType: 'module' });
-  //   let idx = 0;
-  //   const len = parsed.tokens.length;
-  //   let capturing = false;
-  //   const data = {};
-  //   while (idx < len) {
-  //     const token = parsed.tokens[idx];
-  //     if (
-  //       token.type === tokTypes._export &&
-  //       parsed.tokens[idx + 1].type === tokTypes._default &&
-  //       parsed.tokens[idx + 2].type === tokTypes.braceL
-  //     ) {
-  //       capturing = true;
-  //       idx += 3;
-  //     } else if (capturing) {
-  //       if (token.type === tokTypes.braceR) {
-  //         break;
-  //       } else {
-  //         const [item, newIdx] = parseLine(parsed.tokens, idx);
-  //         data[item.key] = item.value;
-  //         idx = newIdx;
-  //       }
-  //     } else {
-  //       idx += 1;
-  //     }
-  //   }
-  //   localeData[file] = data;
-  // }));
 }
