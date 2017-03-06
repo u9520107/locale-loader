@@ -1,0 +1,1 @@
+{"version":3,"sources":["loaderRegExp.js"],"names":["loaderRegExp"],"mappings":";;;;;AAAA,IAAMA,eAAe,yBAArB;kBACeA,Y","file":"loaderRegExp.js","sourcesContent":["const loaderRegExp = /\\/\\* ?loadLocale.*?\\*\\//;\nexport default loaderRegExp;\n"]}

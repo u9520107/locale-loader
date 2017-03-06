@@ -9,3 +9,4 @@ exports.default = function (filename) {
 };
 
 var localeFileRegExp = /^[a-z]{2}((-|_)[a-z]{2})?\.(js|json)$/i;
+//# sourceMappingURL=isLocaleFile.js.map

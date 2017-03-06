@@ -12,3 +12,4 @@ function formatLocale(l) {
   }
   return tokens.join('-');
 }
+//# sourceMappingURL=formatLocale.js.map

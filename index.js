@@ -67,3 +67,4 @@ module.exports = function localeLoader(content) {
     callback(null, content);
   }
 };
+//# sourceMappingURL=index.js.map

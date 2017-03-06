@@ -5,3 +5,4 @@ Object.defineProperty(exports, "__esModule", {
 });
 var loaderRegExp = /\/\* ?loadLocale.*?\*\//;
 exports.default = loaderRegExp;
+//# sourceMappingURL=loaderRegExp.js.map

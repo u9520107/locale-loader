@@ -16,6 +16,10 @@ var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
 
 var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
@@ -122,7 +126,7 @@ var extractData = function () {
             data = {};
 
           case 8:
-            if (!(idx < len)) {
+            if (!(idx < len && idx !== -1)) {
               _context3.next = 28;
               break;
             }
@@ -155,7 +159,7 @@ var extractData = function () {
           case 20:
             _parseLine = parseLine(parsed.tokens, idx), _parseLine2 = (0, _slicedToArray3.default)(_parseLine, 2), item = _parseLine2[0], newIdx = _parseLine2[1];
 
-            data[item.key] = item.value;
+            data[item.key] = item;
             idx = newIdx;
 
           case 23:
@@ -404,13 +408,14 @@ var exportXlf = function () {
                           'trans-unit': missingKeys.map(function (key) {
                             return {
                               _attributes: {
-                                id: '[' + key + ']'
+                                id: '[' + key + ']',
+                                template: sourceFile.data[key].isTemplate ? 'true' : 'false'
                               },
                               source: {
-                                _text: sourceFile.data[key]
+                                _text: sourceFile.data[key].value
                               },
                               target: {
-                                _text: sourceFile.data[key]
+                                _text: sourceFile.data[key].value
                               }
                             };
                           })
@@ -518,14 +523,31 @@ function parseLine(tokens, startingIdx) {
   var token = tokens[idx];
   var keyArray = [];
   do {
-    keyArray.push(token.value || token.type.label);
+    keyArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     idx += 1;
     token = tokens[idx];
   } while (token.type !== _babylon.tokTypes.colon);
+  var valueArray = [];
+  idx += 1;
+  token = tokens[idx];
+  var isTemplate = false;
+  var inTemplate = false;
+  do {
+    if (token.type === _babylon.tokTypes.backQuote) {
+      isTemplate = true;
+      inTemplate = !inTemplate;
+    } else {
+      valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
+    }
+    idx += 1;
+    token = tokens[idx];
+  } while (token.type !== _babylon.tokTypes.comma && (inTemplate || token.type !== _babylon.tokTypes.braceR));
+  var value = (0, _stringify2.default)(valueArray.join(''));
   return [{
     key: keyArray.join(''),
-    value: tokens[idx + 1].value
-  }, idx + 3];
+    value: value.substring(1, value.length - 1),
+    isTemplate: isTemplate
+  }, token.type !== _babylon.tokTypes.braceR ? idx + 1 : -1];
 }
 
 function compileFolderData(files) {
@@ -592,3 +614,4 @@ exports.default = function () {
 
   return exportLocale;
 }();
+//# sourceMappingURL=exportLocale.js.map

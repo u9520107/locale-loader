@@ -1,0 +1,1 @@
+{"version":3,"sources":["noChunkRegExp.js"],"names":["noChunkRegExp"],"mappings":";;;;;AAAA,IAAMA,gBAAgB,mCAAtB;kBACeA,a","file":"noChunkRegExp.js","sourcesContent":["const noChunkRegExp = /\\/\\* ?loadLocale.*?noChunk.*?\\*\\//;\nexport default noChunkRegExp;\n"]}
