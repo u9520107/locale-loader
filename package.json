@@ -6,7 +6,7 @@
   "scripts": {
     "test": "exit 0",
     "gulp": "node ./node_modules/babel-cli/bin/babel-node.js ./node_modules/gulp/bin/gulp.js",
-    "release": "node ./node_modules/babel-cli/bin/babel-node.js ./node_modules/gulp/bin.gulp.js release"
+    "release": "node ./node_modules/babel-cli/bin/babel-node.js ./node_modules/gulp/bin/gulp.js release"
   },
   "repository": {
     "type": "git",
