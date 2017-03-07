@@ -39,3 +39,5 @@ jspm_packages
 release
 localization
 yarn.lock
+
+.tmp
