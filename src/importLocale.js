@@ -76,14 +76,20 @@ function generateMergedContent({
   dataStartIndex,
   dataEndIndex,
   mergedData,
+  trailingComma,
 }) {
   const startString = content.substring(0, dataStartIndex);
   const endString = content.substring(dataEndIndex);
-  const dataString = Object.keys(mergedData).map((key) => {
+  const keys = Object.keys(mergedData);
+  const lastIdx = keys.length - 1;
+  const dataString = keys.map((key, idx) => {
+    const comma = (idx < lastIdx || trailingComma) ?
+      ',' :
+      '';
     const value = mergedData[key].isTemplate ?
       `\`${mergedData[key].value}\`` :
       `'${mergedData[key].value.replace(/'/g, '\\\'')}'`;
-    return `  ${key}: ${value},`;
+    return `  ${key}: ${value}${comma}`;
   }).join('\n');
   return `${startString}\n${dataString}\n${endString}`;
 }
@@ -93,16 +99,12 @@ async function mergeToFiles({
   translatedData,
   sourceFolder,
   sourceLocale,
+  trailingComma,
 }) {
-  // console.log(JSON.stringify(rawData, null, 2));
-  // console.log(JSON.stringify(translatedData, null, 2));
-
   await Promise.all(Object.keys(translatedData).map(async (locale) => {
     await Promise.all(Object.keys(translatedData[locale]).map(async (fileName) => {
       const filePath = path.resolve(sourceFolder, fileName);
-
       const folderPath = path.dirname(filePath);
-      // console.log(folderPath, locale);
       const original = (rawData[folderPath] &&
         rawData[folderPath].files &&
         rawData[folderPath].files[locale] &&
@@ -113,7 +115,6 @@ async function mergeToFiles({
         ...original
       };
       Object.keys(translated).forEach((key) => {
-        // console.log('###', original, translated[key])
         mergedData[key] = {
           ...translated[key],
           isTemplate: (original[key] && original[key].isTemplate === true) ||
@@ -123,8 +124,8 @@ async function mergeToFiles({
       const mergedContent = generateMergedContent({
         ...rawData[folderPath].files[sourceLocale],
         mergedData,
+        trailingComma,
       });
-      // console.log(path.resolve(sourceFolder, fileName), mergedContent);
       await fs.writeFile(path.resolve(sourceFolder, fileName), mergedContent);
     }));
   }));
@@ -135,6 +136,7 @@ async function importLocale({
   localizationFolder = defaultLocalizationFolder,
   sourceLocale = defaultSourceLocale,
   supportedLocales = defaultSupportedLocales,
+  trailingComma = true,
 } = {}) {
   const rawData = await getRawData({
     sourceFolder,
@@ -150,6 +152,7 @@ async function importLocale({
     translatedData,
     sourceFolder,
     sourceLocale,
+    trailingComma,
   });
 }
 
