@@ -289,7 +289,7 @@ function extractXlfData(_ref) {
         units.forEach(function (unit) {
           if (unit._attributes && unit._attributes.id && unit.target && unit.target._text) {
             output[fileName][extractKey(unit._attributes.id)] = {
-              value: JSON.parse('"' + unit.target._text + '"'),
+              value: JSON.parse('"' + unit.target._text.replace(/"/g, '\\"') + '"'),
               isTemplate: unit._attributes.template === 'true'
             };
           }
