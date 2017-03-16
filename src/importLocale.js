@@ -44,7 +44,7 @@ function extractXlfData({ locale, content }) {
             unit.target._text
           ) {
             output[fileName][extractKey(unit._attributes.id)] = {
-              value: JSON.parse(`"${unit.target._text}"`),
+              value: JSON.parse(`"${unit.target._text.replace(/"/g, '\\"')}"`),
               isTemplate: unit._attributes.template === 'true',
             };
           }
