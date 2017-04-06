@@ -29,7 +29,8 @@ var exportXlf = exports.exportXlf = function () {
         sourceLocale = _ref2.sourceLocale,
         supportedLocales = _ref2.supportedLocales,
         sourceFolder = _ref2.sourceFolder,
-        localizationFolder = _ref2.localizationFolder;
+        localizationFolder = _ref2.localizationFolder,
+        exportType = _ref2.exportType;
     var xlfData, allLocales;
     return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
@@ -68,11 +69,11 @@ var exportXlf = exports.exportXlf = function () {
                     var targetFile = folderData.files[locale];
                     var fileName = targetFile && targetFile.file || locale + '.js';
                     var original = _path2.default.relative(sourceFolder, _path2.default.join(folderData.path, fileName));
-                    var missingKeys = keys.filter(function (key) {
+                    var exportKeys = exportType === _exportTypes2.default.full ? keys.slice() : keys.filter(function (key) {
                       return !targetFile || !targetFile.data[key];
                     });
 
-                    if (missingKeys.length) {
+                    if (exportKeys.length) {
                       var data = {
                         _attributes: {
                           original: original,
@@ -81,7 +82,7 @@ var exportXlf = exports.exportXlf = function () {
                           datatype: 'plaintext'
                         },
                         body: {
-                          'trans-unit': missingKeys.map(function (key) {
+                          'trans-unit': exportKeys.map(function (key) {
                             return {
                               _attributes: {
                                 id: '[' + key + ']',
@@ -91,7 +92,7 @@ var exportXlf = exports.exportXlf = function () {
                                 _text: sourceFile.data[key].value
                               },
                               target: {
-                                _text: sourceFile.data[key].value
+                                _text: targetFile && targetFile.data[key] && targetFile.data[key].value || sourceFile.data[key].value
                               }
                             };
                           })
@@ -168,7 +169,9 @@ var exportLocale = function () {
         _ref5$sourceLocale = _ref5.sourceLocale,
         sourceLocale = _ref5$sourceLocale === undefined ? _defaults.defaultSourceLocale : _ref5$sourceLocale,
         _ref5$supportedLocale = _ref5.supportedLocales,
-        supportedLocales = _ref5$supportedLocale === undefined ? _defaults.defaultSupportedLocales : _ref5$supportedLocale;
+        supportedLocales = _ref5$supportedLocale === undefined ? _defaults.defaultSupportedLocales : _ref5$supportedLocale,
+        _ref5$exportType = _ref5.exportType,
+        exportType = _ref5$exportType === undefined ? _exportTypes2.default.diff : _ref5$exportType;
 
     var rawData;
     return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -190,7 +193,8 @@ var exportLocale = function () {
               sourceFolder: sourceFolder,
               localizationFolder: localizationFolder,
               sourceLocale: sourceLocale,
-              supportedLocales: supportedLocales
+              supportedLocales: supportedLocales,
+              exportType: exportType
             });
 
           case 5:
@@ -227,6 +231,10 @@ var _getRawData = require('./getRawData');
 var _getRawData2 = _interopRequireDefault(_getRawData);
 
 var _defaults = require('./defaults');
+
+var _exportTypes = require('./exportTypes');
+
+var _exportTypes2 = _interopRequireDefault(_exportTypes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
