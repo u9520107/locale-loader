@@ -9,6 +9,7 @@ import {
   defaultSourceFolder,
   defaultLocalizationFolder,
 } from './defaults';
+import exportTypes from './exportTypes';
 
 export async function exportXlf({
   rawData,
@@ -16,6 +17,7 @@ export async function exportXlf({
   supportedLocales,
   sourceFolder,
   localizationFolder,
+  exportType,
 }) {
   // console.log(JSON.stringify(rawData, null, 2));
   const xlfData = {};
@@ -50,9 +52,11 @@ export async function exportXlf({
             sourceFolder,
             path.join(folderData.path, fileName),
           );
-          const missingKeys = keys.filter(key => (!targetFile || !targetFile.data[key]));
+          const exportKeys = exportType === exportTypes.full ?
+            keys.slice() :
+            keys.filter(key => (!targetFile || !targetFile.data[key]));
 
-          if (missingKeys.length) {
+          if (exportKeys.length) {
             const data = {
               _attributes: {
                 original,
@@ -61,7 +65,7 @@ export async function exportXlf({
                 datatype: 'plaintext',
               },
               body: {
-                'trans-unit': missingKeys.map(key => ({
+                'trans-unit': exportKeys.map(key => ({
                   _attributes: {
                     id: `[${key}]`,
                     template: sourceFile.data[key].isTemplate ? 'true' : 'false',
@@ -70,7 +74,8 @@ export async function exportXlf({
                     _text: sourceFile.data[key].value,
                   },
                   target: {
-                    _text: sourceFile.data[key].value,
+                    _text: (targetFile && targetFile.data[key] && targetFile.data[key].value) ||
+                    sourceFile.data[key].value,
                   },
                 })),
               },
@@ -99,6 +104,7 @@ async function exportLocale({
   localizationFolder = defaultLocalizationFolder,
   sourceLocale = defaultSourceLocale,
   supportedLocales = defaultSupportedLocales,
+  exportType = exportTypes.diff,
 } = {}) {
   const rawData = await getRawData({
     sourceFolder,
@@ -111,6 +117,7 @@ async function exportLocale({
     localizationFolder,
     sourceLocale,
     supportedLocales,
+    exportType,
   });
 }
 
