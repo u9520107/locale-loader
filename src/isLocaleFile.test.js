@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import isLocaleFile from './';
+import isLocaleFile from './isLocaleFile';
 
 /* global describe it */
 

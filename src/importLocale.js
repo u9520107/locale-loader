@@ -1,6 +1,7 @@
 import fs from 'fs-promise';
 import path from 'path';
 import xml from 'xml-js';
+import escodegen from 'escodegen';
 
 import getRawData from './getRawData';
 import {
@@ -44,8 +45,10 @@ function extractXlfData({ locale, content }) {
             unit.target._text
           ) {
             output[fileName][extractKey(unit._attributes.id)] = {
-              value: JSON.parse(`"${unit.target._text.replace(/"/g, '\\"')}"`),
-              isTemplate: unit._attributes.template === 'true',
+              value: escodegen.generate({
+                type: 'Literal',
+                value: unit.target._text,
+              }),
             };
           }
         });
@@ -86,10 +89,7 @@ function generateMergedContent({
     const comma = (idx < lastIdx || trailingComma) ?
       ',' :
       '';
-    const value = mergedData[key].isTemplate ?
-      `\`${mergedData[key].value}\`` :
-      `'${mergedData[key].value.replace(/'/g, '\\\'')}'`;
-    return `  ${key}: ${value}${comma}`;
+    return `  ${key}: ${mergedData[key].value}${comma}`;
   }).join('\n');
   return `${startString}\n${dataString}\n${endString}`;
 }
@@ -105,6 +105,8 @@ async function mergeToFiles({
     await Promise.all(Object.keys(translatedData[locale]).map(async (fileName) => {
       const filePath = path.resolve(sourceFolder, fileName);
       const folderPath = path.dirname(filePath);
+      if (!rawData[folderPath] || !rawData[folderPath].files[sourceLocale]) return;
+
       const original = (rawData[folderPath] &&
         rawData[folderPath].files &&
         rawData[folderPath].files[locale] &&
@@ -117,8 +119,6 @@ async function mergeToFiles({
       Object.keys(translated).forEach((key) => {
         mergedData[key] = {
           ...translated[key],
-          isTemplate: (original[key] && original[key].isTemplate === true) ||
-            translated[key].isTemplate === true,
         };
       });
       const mergedContent = generateMergedContent({

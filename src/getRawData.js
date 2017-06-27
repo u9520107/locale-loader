@@ -1,23 +1,9 @@
 import fs from 'fs-promise';
 import path from 'path';
-import glob from 'glob';
 import { parse, tokTypes } from 'babylon';
 import isLocaleFile from './isLocaleFile';
-import loaderRegExp from './loaderRegExp';
 import formatLocale from './formatLocale';
-
-export async function getLoaderFiles(fileList) {
-  const loaderFiles = new Set();
-  await Promise.all(fileList.map(async (file) => {
-    if ((await fs.stat(file)).isFile()) {
-      const content = await fs.readFile(file, 'utf8');
-      if (loaderRegExp.test(content)) {
-        loaderFiles.add(file);
-      }
-    }
-  }));
-  return [...loaderFiles];
-}
+import getLoaderFiles from './getLoaderFiles';
 
 export function parseLine(tokens, startingIdx) {
   let idx = startingIdx;
@@ -31,25 +17,21 @@ export function parseLine(tokens, startingIdx) {
   const valueArray = [];
   idx += 1;
   token = tokens[idx];
-  let isTemplate = false;
-  let inTemplate = false;
   do {
     if (
       token.type === tokTypes.backQuote
     ) {
-      isTemplate = true;
-      inTemplate = !inTemplate;
+      throw new Error('Template strings are not supported');
     } else {
       valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     }
     idx += 1;
     token = tokens[idx];
-  } while (token.type !== tokTypes.comma && (inTemplate || token.type !== tokTypes.braceR));
-  const value = JSON.stringify(valueArray.join(''));
+  } while (token.type !== tokTypes.comma && (token.type !== tokTypes.braceR));
+  const value = valueArray.join('');
   return [{
     key: keyArray.join(''),
-    value: value.substring(1, value.length - 1),
-    isTemplate,
+    value,
   }, token.type !== tokTypes.braceR ? idx + 1 : -1];
 }
 
@@ -118,15 +100,7 @@ export default async function getRawData({
   sourceLocale,
   supportedLocales,
 }) {
-  const fileList = await new Promise((resolve, reject) => {
-    glob(`${sourceFolder}/**`, (err, m) => {
-      if (err) {
-        return reject(err);
-      }
-      return resolve(m);
-    });
-  });
-  const loaderFiles = await getLoaderFiles(fileList);
+  const loaderFiles = await getLoaderFiles(sourceFolder);
   const rawData = {};
   await Promise.all(loaderFiles.map(async (f) => {
     const folderPath = path.resolve(path.dirname(f));
