@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import isLocaleFile from './';
+import isLocaleFile from './isLocaleFile';
 
 /* global describe it */
 
@@ -39,6 +39,25 @@ describe('isLocaleFile', () => {
     it(`should return false for ${fileName}.js or ${fileName}.json`, () => {
       expect(isLocaleFile(`${fileName}.js`)).to.equal(false);
       expect(isLocaleFile(`${fileName}.json`)).to.equal(false);
+    });
+  });
+
+  [
+    '',
+    '.wrong',
+  ].forEach((ext) => {
+    it(`should return false for extension "${ext}"`, () => {
+      expect(isLocaleFile(`en-US${ext}`)).to.equal(false);
+    });
+  });
+  [
+    '.js',
+    '.JS',
+    '.JSON',
+    '.json',
+  ].forEach((ext) => {
+    it(`should return true for extension "${ext}"`, () => {
+      expect(isLocaleFile(`en-US${ext}`)).to.equal(true);
     });
   });
 });

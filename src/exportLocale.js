@@ -68,7 +68,6 @@ export async function exportXlf({
                 'trans-unit': exportKeys.map(key => ({
                   _attributes: {
                     id: `[${key}]`,
-                    template: sourceFile.data[key].isTemplate ? 'true' : 'false',
                   },
                   source: {
                     _text: sourceFile.data[key].value,
