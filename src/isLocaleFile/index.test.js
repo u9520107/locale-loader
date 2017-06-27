@@ -41,4 +41,23 @@ describe('isLocaleFile', () => {
       expect(isLocaleFile(`${fileName}.json`)).to.equal(false);
     });
   });
+
+  [
+    '',
+    '.wrong',
+  ].forEach((ext) => {
+    it(`should return false for extension "${ext}"`, () => {
+      expect(isLocaleFile(`en-US${ext}`)).to.equal(false);
+    });
+  });
+  [
+    '.js',
+    '.JS',
+    '.JSON',
+    '.json',
+  ].forEach((ext) => {
+    it(`should return true for extension "${ext}"`, () => {
+      expect(isLocaleFile(`en-US${ext}`)).to.equal(true);
+    });
+  });
 });

@@ -9,9 +9,3 @@ export default function (filename) {
   const name = filename.replace(fileRegExp, '');
   return localeFileRegExp.test(name);
 }
-
-// Known forms:
-// aa-Aaaa-AA
-// aa-000
-// aa-AA
-// aaa-AA
