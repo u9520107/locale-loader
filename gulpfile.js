@@ -4,6 +4,13 @@ import fs from 'fs-promise';
 import babel from 'gulp-babel';
 import sourcemaps from 'gulp-sourcemaps';
 import cp from 'child_process';
+import yargs from 'yargs';
+import istanbul from 'gulp-istanbul';
+import babelIstanbul from 'babel-istanbul';
+import mocha from 'gulp-mocha';
+
+const TIMEOUT = 30000;
+const argv = yargs.argv;
 
 async function rm(filepath) {
   if (await fs.exists(filepath)) {
@@ -81,3 +88,70 @@ gulp.task('release', ['release-copy'], async () => {
   }
   await fs.writeFile('release/package.json', JSON.stringify(packageInfo, null, 2));
 });
+
+
+function getTestSources() {
+  const src = new Set();
+
+  // check --folder
+  if (argv.folder) {
+    if (Array.isArray(argv.folder)) {
+      argv.folder.forEach((str) => {
+        str.split(',').forEach((f) => {
+          src.add(`${f}/**/*.test.js`);
+        });
+      });
+    } else {
+      argv.folder.split(',').forEach((f) => {
+        src.add(`${f}/**/*.test.js`);
+      });
+    }
+  }
+
+  // check --file
+  if (argv.file) {
+    if (Array.isArray(argv.file)) {
+      argv.file.forEach((str) => {
+        str.split(',').forEach((f) => {
+          src.add(f);
+        });
+      });
+    } else {
+      argv.file.split(',').forEach((f) => {
+        src.add(f);
+      });
+    }
+  }
+
+  if (!src.size) {
+    src.add('src/**/*.test.js');
+  }
+
+  return [...src];
+}
+
+gulp.task('pre-coverage', () => {
+  const testSources = getTestSources();
+
+  return gulp.src(['src/**/*.js', '!src/**/*.test.js', '!src/integration-test/**/*.js'])
+    .pipe(istanbul({
+      includeUntested: testSources.length === 1 && testSources[0] === 'src/**/*.test.js',
+      instrumenter: babelIstanbul.Instrumenter,
+    }))
+    .pipe(istanbul.hookRequire());
+});
+
+gulp.task('test', ['pre-coverage'], () => (
+  gulp.src(getTestSources())
+    .pipe(mocha({
+      timeout: TIMEOUT,
+    }))
+    .pipe(istanbul.writeReports())
+));
+
+gulp.task('quick-test', () => (
+  gulp.src(getTestSources())
+    .pipe(mocha({
+      timeout: TIMEOUT,
+    }))
+));
