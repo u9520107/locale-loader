@@ -7,7 +7,7 @@ export const defaultSupportedLocales = [
   'it-IT',
   'es-ES',
   'es-419',
-  'jp-JP',
+  'ja-JP',
   'pt-BR',
 ];
 
