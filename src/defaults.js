@@ -7,6 +7,8 @@ export const defaultSupportedLocales = [
   'it-IT',
   'es-ES',
   'es-419',
+  'jp-JP',
+  'pt-BR',
 ];
 
 export const defaultSourceLocale = 'en-US';
