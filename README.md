@@ -13,7 +13,7 @@ Sample File Structure:
              |--localeLoader.js
 ```
 
-Locale files
+Locale Files
 ---
 Can be js or json, as long as it can be imported as an object.
 Does not support nested structures.
