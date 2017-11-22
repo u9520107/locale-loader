@@ -27,12 +27,13 @@ export function parseLine(tokens, startingIdx) {
     }
     idx += 1;
     token = tokens[idx];
-  } while (token.type !== tokTypes.comma && (token.type !== tokTypes.braceR));
+  } while (token.type !== tokTypes.comma && token.type !== tokTypes.braceR);
   const value = valueArray.join('');
-  return [{
+  return {
     key: keyArray.join(''),
     value,
-  }, token.type !== tokTypes.braceR ? idx + 1 : -1];
+    endIdx: idx,
+  };
 }
 
 export async function extractData(localeFile) {
@@ -44,7 +45,7 @@ export async function extractData(localeFile) {
   const data = {};
   let dataStartIndex = null;
   let dataEndIndex = null;
-  while (idx < len && idx !== -1) {
+  while (idx < len) {
     const token = parsed.tokens[idx];
     if (
       token.type === tokTypes._export &&
@@ -59,15 +60,22 @@ export async function extractData(localeFile) {
         dataEndIndex = token.start;
         break;
       } else {
-        const [item, newIdx] = parseLine(parsed.tokens, idx);
-        data[item.key] = item;
-        idx = newIdx;
+        const { key, value, endIdx } = parseLine(parsed.tokens, idx);
+        data[key] = {
+          key,
+          value,
+        };
+        if (parsed.tokens[endIdx].type !== tokTypes.braceR) {
+          idx = endIdx + 1;
+        } else {
+          dataEndIndex = parsed.tokens[endIdx].start;
+          break;
+        }
       }
     } else {
       idx += 1;
     }
   }
-
   return {
     content,
     data,
