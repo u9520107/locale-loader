@@ -113,9 +113,17 @@ async function mergeToFiles({
         rawData[folderPath].files[locale].data) || {};
 
       const translated = translatedData[locale][fileName];
-      const mergedData = {
-        ...original
-      };
+      const mergedData = {};
+      // convert original values into string literals
+      Object.keys(original).forEach((key) => {
+        mergedData[key] = {
+          ...original[key],
+          value: escodegen.generate({
+            type: 'Literal',
+            value: original[key].value,
+          }),
+        };
+      });
       Object.keys(translated).forEach((key) => {
         mergedData[key] = {
           ...translated[key],
