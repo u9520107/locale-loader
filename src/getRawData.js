@@ -1,8 +1,8 @@
 import fs from 'fs-promise';
 import path from 'path';
 import { parse, tokTypes } from 'babylon';
-import isLocaleFile from './isLocaleFile';
-import formatLocale from './formatLocale';
+import isLocaleFile from './lib/isLocaleFile';
+import formatLocale from './lib/formatLocale';
 import getLoaderFiles from './getLoaderFiles';
 
 export function parseLine(tokens, startingIdx) {

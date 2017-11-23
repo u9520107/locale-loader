@@ -1,12 +1,9 @@
 import { expect } from 'chai';
-import isLocaleFile from './isLocaleFile';
+import isLocaleFile from './';
 
 /* global describe it */
 
 describe('isLocaleFile', () => {
-  it('should be a function', () => {
-    expect(isLocaleFile).to.be.a('function');
-  });
   [
     'aa-Aaaa-AA',
     'aa-000',

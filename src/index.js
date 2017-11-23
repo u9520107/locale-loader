@@ -1,6 +1,6 @@
 import fs from 'fs-promise';
 import generateLoader from './generateLoader';
-import isLocaleFile from './isLocaleFile';
+import isLocaleFile from './lib/isLocaleFile';
 import loaderRegExp from './loaderRegExp';
 import noChunkRegExp from './noChunkRegExp';
 

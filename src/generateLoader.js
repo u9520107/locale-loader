@@ -1,5 +1,5 @@
 import dedent from 'dedent';
-import formatLocale from './formatLocale';
+import formatLocale from './lib/formatLocale';
 
 export default function generateLoader({
   files,
