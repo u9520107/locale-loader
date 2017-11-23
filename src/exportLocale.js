@@ -3,13 +3,7 @@ import path from 'path';
 import xml from 'xml-js';
 import mkdirp from 'mkdirp-promise';
 import getRawData from './getRawData';
-import {
-  defaultSupportedLocales,
-  defaultSourceLocale,
-  defaultSourceFolder,
-  defaultLocalizationFolder,
-} from './defaults';
-import exportTypes from './exportTypes';
+import defaultConfig from './defaultConfig';
 
 export async function exportXlf({
   rawData,
@@ -52,7 +46,7 @@ export async function exportXlf({
             sourceFolder,
             path.join(folderData.path, fileName),
           );
-          const exportKeys = exportType === exportTypes.full ?
+          const exportKeys = exportType.toLowerCase() === 'full' ?
             keys.slice() :
             keys.filter(key => (!targetFile || !targetFile.data[key]));
 
@@ -99,11 +93,11 @@ export async function exportXlf({
 }
 
 async function exportLocale({
-  sourceFolder = defaultSourceFolder,
-  localizationFolder = defaultLocalizationFolder,
-  sourceLocale = defaultSourceLocale,
-  supportedLocales = defaultSupportedLocales,
-  exportType = exportTypes.diff,
+  sourceFolder = defaultConfig.sourceFolder,
+  localizationFolder = defaultConfig.localizationFolder,
+  sourceLocale = defaultConfig.sourceLocale,
+  supportedLocales = defaultConfig.supportedLocales,
+  exportType = 'diff',
 } = {}) {
   const rawData = await getRawData({
     sourceFolder,
