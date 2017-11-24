@@ -3,7 +3,7 @@ import path from 'path';
 import xml from 'xml-js';
 import escodegen from 'escodegen';
 
-import getRawData from './getRawData';
+import getRawData from './lib/getRawData';
 import defaultConfig from './defaultConfig';
 
 function extractKey(str) {
