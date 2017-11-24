@@ -1,10 +1,17 @@
 import fs from 'fs-extra';
 import glob from 'glob';
-import isLoaderFile from './lib/isLoaderFile';
+import isLoaderFile from '../isLoaderFile';
 
+/**
+ * @function
+ * @description Return all the loader file paths in the specified folder.
+ * @param {String} folder
+ * @returns {Promise<String[]>}
+ */
 export default async function getLoaderFiles(folder) {
   const fileList = await new Promise((resolve, reject) => {
     glob(`${folder}/**`, (err, m) => {
+      /* istanbul ignore if */
       if (err) {
         return reject(err);
       }

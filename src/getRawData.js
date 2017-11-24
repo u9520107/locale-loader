@@ -3,7 +3,7 @@ import path from 'path';
 import { parse, tokTypes } from 'babylon';
 import isLocaleFile from './lib/isLocaleFile';
 import formatLocale from './lib/formatLocale';
-import getLoaderFiles from './getLoaderFiles';
+import getLoaderFiles from './lib/getLoaderFiles';
 
 export function parseLine(tokens, startingIdx) {
   let idx = startingIdx;
