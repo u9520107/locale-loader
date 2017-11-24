@@ -1,7 +1,17 @@
 import dedent from 'dedent';
 import formatLocale from '../formatLocale';
-
-export default function generateLoader({
+/**
+ * @typedef GLCOptions
+ * @property {String[]} files
+ * @property {Boolean} [chunk]
+ *
+ */
+/**
+ * @function
+ * @description Generate js code for localeLoader according the files listed.
+ * @param {GLCOptions} options
+ */
+export default function generateLoaderContent(/** @type {GLCOptions} */ {
   files,
   chunk = true,
 }) {

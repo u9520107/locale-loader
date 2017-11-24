@@ -2,7 +2,7 @@ import through from 'through2';
 import fs from 'fs-extra';
 import path from 'path';
 import isLocaleFile from './lib/isLocaleFile';
-import generateLoader from './generateLoader';
+import generateLoaderContent from './lib/generateLoaderContent';
 import isLoaderFile from './lib/isLoaderFile';
 
 export default function transformLocaleLoader({
@@ -13,7 +13,7 @@ export default function transformLocaleLoader({
     if (isLoaderFile(content)) {
       const folderPath = path.dirname(file.path);
       const files = (await fs.readdir(folderPath)).filter(isLocaleFile);
-      const loader = generateLoader({
+      const loader = generateLoaderContent({
         files,
         noChunk: noChunk || isLoaderFile.noChunk(content),
       });
