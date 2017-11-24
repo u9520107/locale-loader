@@ -1,5 +1,14 @@
 import dedent from 'dedent';
 import formatLocale from '../formatLocale';
+
+function byLocale(a, b) {
+  const ta = formatLocale(a);
+  const tb = formatLocale(b);
+  if (ta === tb) return 0;
+  return ta > tb ?
+    1 :
+    -1;
+}
 /**
  * @typedef GLCOptions
  * @property {String[]} files
@@ -15,9 +24,11 @@ export default function generateLoaderContent(/** @type {GLCOptions} */ {
   files,
   chunk = true,
 }) {
-  const cases = files.map((f) => {
+  const usedLang = {};
+  const cases = files.sort(byLocale).map((f) => {
     const basename = f.replace(/\.(js|json)$/i, '');
     const locale = formatLocale(basename);
+    const lang = locale.split('-')[0];
     const padding = chunk ? '  ' : '';
     let code = `
             ${padding}const data = require('./${basename}');
@@ -27,7 +38,14 @@ export default function generateLoaderContent(/** @type {GLCOptions} */ {
             require.ensure(['./${basename}'], (require) => {${code}
             }, '${locale}');`;
     }
-    return `
+    let langDefaultCase = '';
+    if (!usedLang[lang]) {
+      usedLang[lang] = true;
+      langDefaultCase = `
+        case '${lang}':
+      `;
+    }
+    return `${langDefaultCase}
           case '${locale}': {${code}
             break;
           }`;

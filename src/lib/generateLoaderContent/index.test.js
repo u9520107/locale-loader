@@ -3,6 +3,7 @@ import { transform } from 'babel-core';
 import generateLoaderContent from './';
 import formatLocale from '../formatLocale';
 
+/* eslint { no-eval: 0 } */
 
 /* global describe it */
 const files = [
@@ -12,11 +13,12 @@ const files = [
 ];
 
 const babelOptions = {
-  "presets": [ "es2015", "stage-0"],
-  "plugins": [
-    "transform-runtime"
+  presets: ['es2015', 'stage-0'],
+  plugins: [
+    'transform-runtime'
   ],
-}
+};
+
 describe('generateLoaderContent', () => {
   it('should generate string', () => {
     const content = generateLoaderContent({ files });
@@ -27,11 +29,15 @@ describe('generateLoaderContent', () => {
     files.forEach((file) => {
       const baseName = file.split('.')[0];
       const locale = formatLocale(baseName);
+      const lang = locale.split('-')[0];
       it(`should contain ${baseName}`, () => {
         expect(content.indexOf(baseName) !== -1).to.equal(true);
       });
       it(`should contain formatted locale name ${locale}`, () => {
         expect(content.indexOf(locale) !== -1).to.equal(true);
+      });
+      it(`should contain case '${lang}': `, () => {
+        expect(content.indexOf(`case '${lang}':`) > -1).to.equal(true);
       });
     });
     it('should be valid js file content', () => {
@@ -43,7 +49,7 @@ describe('generateLoaderContent', () => {
   });
   it('should accept chunk = false parameter', () => {
     let content;
-    expect(() => { content = generateLoaderContent({ files, chunk: false });}).to.not.throw();
+    expect(() => { content = generateLoaderContent({ files, chunk: false }); }).to.not.throw();
     expect(content.indexOf('ensure')).to.equal(-1);
   });
 });

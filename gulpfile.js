@@ -9,8 +9,8 @@ import istanbul from 'gulp-istanbul';
 import babelIstanbul from 'babel-istanbul';
 import mocha from 'gulp-mocha';
 
-// import exportLocale from './src/exportLocale';
-// import importLocale from './src/importLocale';
+import exportLocale from './src/exportLocale';
+import importLocale from './src/importLocale';
 
 const TIMEOUT = 30000;
 const argv = yargs.argv;
@@ -159,9 +159,9 @@ gulp.task('quick-test', () => (
     }))
 ));
 
-// gulp.task('test-export-locale', () => exportLocale({
-//   sourceFolder: 'testData',
-// }));
-// gulp.task('test-import-locale', () => importLocale({
-//   sourceFolder: 'testData',
-// }));
+gulp.task('test-export-locale', () => exportLocale({
+  sourceFolder: 'testData',
+}));
+gulp.task('test-import-locale', () => importLocale({
+  sourceFolder: 'testData',
+}));

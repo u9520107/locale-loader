@@ -1,5 +1,5 @@
 export default {
-  supportedLocale: [
+  supportedLocales: [
     'en-GB',
     'en-CA',
     'fr-FR',
