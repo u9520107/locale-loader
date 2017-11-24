@@ -1,4 +1,4 @@
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import path from 'path';
 import { parse, tokTypes } from 'babylon';
 import isLocaleFile from './lib/isLocaleFile';

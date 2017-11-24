@@ -1,4 +1,4 @@
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import glob from 'glob';
 import isLoaderFile from './lib/isLoaderFile';
 

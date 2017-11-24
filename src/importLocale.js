@@ -1,4 +1,4 @@
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import path from 'path';
 import xml from 'xml-js';
 import escodegen from 'escodegen';

@@ -1,4 +1,4 @@
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import generateLoader from './generateLoader';
 import isLocaleFile from './lib/isLocaleFile';
 import isLoaderFile from './lib/isLoaderFile';
