@@ -28,7 +28,6 @@
     "babel-preset-stage-0": "^6.16.0",
     "chai": "^4.0.2",
     "co-exec": "^1.0",
-    "dedent": "^0.7.0",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.2.0",
@@ -46,10 +45,10 @@
   },
   "dependencies": {
     "babylon": "^6.16.1",
+    "dedent": "^0.7.0",
     "escodegen": "^1.8.1",
-    "fs-promise": "^2.0.3",
+    "fs-extra": "^4.0.2",
     "glob": "^7.1.1",
-    "mkdirp-promise": "^5.0.1",
     "through2": "^2.0.3",
     "xml-js": "^1.0.2"
   }

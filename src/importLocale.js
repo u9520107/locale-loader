@@ -1,15 +1,10 @@
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import path from 'path';
 import xml from 'xml-js';
 import escodegen from 'escodegen';
 
-import getRawData from './getRawData';
-import {
-  defaultSupportedLocales,
-  defaultSourceLocale,
-  defaultSourceFolder,
-  defaultLocalizationFolder,
-} from './defaults';
+import getRawData from './lib/getRawData';
+import defaultConfig from './defaultConfig';
 
 function extractKey(str) {
   return str.substring(1, str.length - 1);
@@ -140,10 +135,10 @@ async function mergeToFiles({
 }
 
 async function importLocale({
-  sourceFolder = defaultSourceFolder,
-  localizationFolder = defaultLocalizationFolder,
-  sourceLocale = defaultSourceLocale,
-  supportedLocales = defaultSupportedLocales,
+  sourceFolder = defaultConfig.sourceFolder,
+  localizationFolder = defaultConfig.localizationFolder,
+  sourceLocale = defaultConfig.sourceLocale,
+  supportedLocales = defaultConfig.supportedLocales,
   trailingComma = true,
 } = {}) {
   const rawData = await getRawData({

@@ -1,6 +1,6 @@
 import gulp from 'gulp';
 import path from 'path';
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import babel from 'gulp-babel';
 import sourcemaps from 'gulp-sourcemaps';
 import cp from 'child_process';

@@ -1,22 +1,21 @@
 import through from 'through2';
-import fs from 'fs-promise';
+import fs from 'fs-extra';
 import path from 'path';
-import isLocaleFile from './isLocaleFile';
-import generateLoader from './generateLoader';
-import loaderRegExp from './loaderRegExp';
-import noChunkRegExp from './noChunkRegExp';
+import isLocaleFile from './lib/isLocaleFile';
+import generateLoaderContent from './lib/generateLoaderContent';
+import isLoaderFile from './lib/isLoaderFile';
 
 export default function transformLocaleLoader({
   noChunk = false,
 } = {}) {
   return through.obj(async function transform(file, enc, done) {
     const content = file.contents.toString(enc);
-    if (loaderRegExp.test(content)) {
+    if (isLoaderFile(content)) {
       const folderPath = path.dirname(file.path);
       const files = (await fs.readdir(folderPath)).filter(isLocaleFile);
-      const loader = generateLoader({
+      const loader = generateLoaderContent({
         files,
-        noChunk: noChunk || noChunkRegExp.test(content),
+        noChunk: noChunk || isLoaderFile.noChunk(content),
       });
       file.contents = new Buffer(loader, 'utf8');
     }
