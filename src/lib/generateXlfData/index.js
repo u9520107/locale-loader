@@ -8,7 +8,7 @@ export default function generateXlfData({
   sourceFolder,
   exportType,
 }) {
-  // console.log(JSON.stringify(rawData, null, 2));
+  const isFull = exportType.toLowerCase() === 'full';
   const jsonData = {};
   const allLocales = supportedLocales.filter(locale => locale !== sourceLocale);
 
@@ -41,11 +41,32 @@ export default function generateXlfData({
             sourceFolder,
             path.join(folderData.path, fileName),
           );
-          const exportKeys = exportType.toLowerCase() === 'full' ?
-            keys.slice() :
-            keys.filter(key => (!targetFile || !targetFile.data[key]));
-
-          if (exportKeys.length) {
+          const transUnits = [];
+          keys.forEach((key) => {
+            const diff = (
+              !targetFile ||
+              !targetFile.data[key] ||
+              (targetFile.data[key].source &&
+                targetFile.data[key].source !== sourceFile.data[key].value)
+            );
+            if (diff || isFull) {
+              const unit = {
+                _attributes: {
+                  id: `[${key}]`,
+                },
+                source: {
+                  _text: sourceFile.data[key].value,
+                },
+                target: {
+                  _text: diff ?
+                    sourceFile.data[key].value :
+                    targetFile.data[key].value
+                },
+              };
+              transUnits.push(unit);
+            }
+          });
+          if (transUnits.length) {
             const data = {
               _attributes: {
                 original,
@@ -54,21 +75,9 @@ export default function generateXlfData({
                 datatype: 'plaintext',
               },
               body: {
-                'trans-unit': exportKeys.map(key => ({
-                  _attributes: {
-                    id: `[${key}]`,
-                  },
-                  source: {
-                    _text: sourceFile.data[key].value,
-                  },
-                  target: {
-                    _text: (targetFile && targetFile.data[key] && targetFile.data[key].value) ||
-                    sourceFile.data[key].value,
-                  },
-                })),
+                'trans-unit': transUnits,
               },
             };
-
             if (!jsonData[locale].xliff.file) {
               jsonData[locale].xliff.file = [];
             }
