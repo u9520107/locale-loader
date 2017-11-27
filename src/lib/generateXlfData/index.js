@@ -9,6 +9,7 @@ export default function generateXlfData({
   exportType,
 }) {
   const isFull = exportType.toLowerCase() === 'full';
+  const onlyTranslated = exportType.toLowerCase() === 'translated';
   const jsonData = {};
   const allLocales = supportedLocales.filter(locale => locale !== sourceLocale);
 
@@ -43,27 +44,51 @@ export default function generateXlfData({
           );
           const transUnits = [];
           keys.forEach((key) => {
-            const diff = (
-              !targetFile ||
-              !targetFile.data[key] ||
-              (targetFile.data[key].source &&
-                targetFile.data[key].source !== sourceFile.data[key].value)
-            );
-            if (diff || isFull) {
-              const unit = {
-                _attributes: {
-                  id: `[${key}]`,
-                },
-                source: {
-                  _text: sourceFile.data[key].value,
-                },
-                target: {
-                  _text: diff ?
-                    sourceFile.data[key].value :
-                    targetFile.data[key].value
-                },
-              };
-              transUnits.push(unit);
+            if (onlyTranslated) {
+              if (
+                targetFile &&
+                targetFile.data[key] &&
+                (
+                  !targetFile.data[key].source ||
+                  targetFile.data[key].source === sourceFile.data[key].value
+                )
+              ) {
+                const unit = {
+                  _attributes: {
+                    id: `[${key}]`,
+                  },
+                  source: {
+                    _text: sourceFile.data[key].value,
+                  },
+                  target: {
+                    _text: targetFile.data[key].value
+                  },
+                };
+                transUnits.push(unit);
+              }
+            } else {
+              const diff = (
+                !targetFile ||
+                !targetFile.data[key] ||
+                (targetFile.data[key].source &&
+                  targetFile.data[key].source !== sourceFile.data[key].value)
+              );
+              if (!onlyTranslated && diff || isFull) {
+                const unit = {
+                  _attributes: {
+                    id: `[${key}]`,
+                  },
+                  source: {
+                    _text: sourceFile.data[key].value,
+                  },
+                  target: {
+                    _text: diff ?
+                      sourceFile.data[key].value :
+                      targetFile.data[key].value
+                  },
+                };
+                transUnits.push(unit);
+              }
             }
           });
           if (transUnits.length) {
