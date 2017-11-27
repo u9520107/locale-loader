@@ -84,6 +84,44 @@ describe('exportLocale', () => {
       expect(content.indexOf('[obj.key]') > -1).to.equal(true);
       expect(content.indexOf('test') > -1).to.equal(true);
     });
+    it('should be able to export all entries when exportType === "full"', async () => {
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+        export default {
+          modern: 'rogue',
+        };
+      `);
+      await exportLocale({
+        sourceFolder: testFolder,
+        supportedLocales: ['en-US', 'en-GB'],
+        exportType: 'full',
+      });
+      const content = await fs.readFile(path.resolve(localizationFolder, 'en-GB.xlf'), 'utf8');
+      expect(content.indexOf('modern') > -1).to.equal(true);
+      expect(content.indexOf('rogue') > -1).to.equal(true);
+      expect(content.indexOf('whisky') > -1).to.equal(true);
+      expect(content.indexOf('Vault') > -1).to.equal(true);
+      expect(content.indexOf('[obj.key]') > -1).to.equal(true);
+      expect(content.indexOf('test') > -1).to.equal(true);
+    });
+    it('should be able to export on translated entries when exportType === "translated"', async () => {
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+        export default {
+          modern: 'rogue',
+        };
+      `);
+      await exportLocale({
+        sourceFolder: testFolder,
+        supportedLocales: ['en-US', 'en-GB'],
+        exportType: 'translated',
+      });
+      const content = await fs.readFile(path.resolve(localizationFolder, 'en-GB.xlf'), 'utf8');
+      expect(content.indexOf('modern') > -1).to.equal(true);
+      expect(content.indexOf('rogue') > -1).to.equal(true);
+      expect(content.indexOf('whisky') > -1).to.equal(false);
+      expect(content.indexOf('Vault') > -1).to.equal(false);
+      expect(content.indexOf('[obj.key]') > -1).to.equal(false);
+      expect(content.indexOf('test') > -1).to.equal(false);
+    });
     it('should export entries that have been changed since last import', async () => {
       await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
         export default {
@@ -105,5 +143,4 @@ describe('exportLocale', () => {
       expect(content.indexOf('Vault') > -1).to.equal(true);
     });
   });
-
 });
