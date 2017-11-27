@@ -4,8 +4,8 @@
   "description": "Locale Loader for webpack",
   "main": "index.js",
   "scripts": {
-    "test": "exit 0",
     "gulp": "node ./node_modules/babel-cli/bin/babel-node.js ./node_modules/gulp/bin/gulp.js",
+    "test": "yarn gulp test",
     "release": "node ./node_modules/babel-cli/bin/babel-node.js ./node_modules/gulp/bin/gulp.js release"
   },
   "repository": {
@@ -27,6 +27,7 @@
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-stage-0": "^6.16.0",
     "chai": "^4.0.2",
+    "chalk": "^2.3.0",
     "co-exec": "^1.0",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "^15.0.1",
