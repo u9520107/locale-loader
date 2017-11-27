@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
-import getRawData from './lib/getRawData';
-import defaultConfig from './defaultConfig';
-import generateXlfData from './lib/generateXlfData';
+import getRawData from '../getRawData';
+import defaultConfig from '../../defaultConfig';
+import generateXlfData from '../generateXlfData';
 
 async function writeXlf({
   localizationFolder,

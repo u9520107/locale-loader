@@ -36,8 +36,25 @@ export function parseLine(tokens, startingIdx) {
   };
 }
 
+export function extractAnnotations(content) {
+  const annotationRegExp = /\/\/ @key: '\[(.*)\]'.*?@source: '(.*)'/g;
+  const annotations = new Map();
+  let match;
+  /* eslint { 'no-cond-assign': 0 } */
+  while ((match = annotationRegExp.exec(content)) !== null) {
+    annotations.set(match[1], match[2]);
+  }
+  return {
+    content: content.replace(annotationRegExp, ''),
+    annotations
+  };
+}
+
 export async function extractData(localeFile) {
-  const content = await fs.readFile(localeFile, 'utf8');
+  const {
+    content,
+    annotations,
+  } = extractAnnotations(await fs.readFile(localeFile, 'utf8'));
   const parsed = parse(content, { sourceType: 'module' });
   let idx = 0;
   const len = parsed.tokens.length;
@@ -64,6 +81,7 @@ export async function extractData(localeFile) {
         data[key] = {
           key,
           value,
+          source: annotations.get(key),
         };
         if (parsed.tokens[endIdx].type !== tokTypes.braceR) {
           idx = endIdx + 1;
