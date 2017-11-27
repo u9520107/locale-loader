@@ -37,12 +37,13 @@ export function parseLine(tokens, startingIdx) {
 }
 
 export function extractAnnotations(content) {
-  const annotationRegExp = /\/\/ @key: '\[(.*)\]'.*?@source: '(.*)'/g;
+  const annotationRegExp = /\/\/ @key: @#@(.*)@#@.*?@source: @#@(.*)@#@/g;
   const annotations = new Map();
   let match;
   /* eslint { 'no-cond-assign': 0 } */
   while ((match = annotationRegExp.exec(content)) !== null) {
-    annotations.set(match[1], match[2]);
+    console.log(JSON.parse(match[1]), JSON.parse(match[2]));
+    annotations.set(JSON.parse(match[1]), JSON.parse(match[2]));
   }
   return {
     content: content.replace(annotationRegExp, ''),

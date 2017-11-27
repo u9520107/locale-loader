@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
-import dedent from 'dedent';
 import { transform } from 'babel-core';
 import importLocale from './';
 import exportLocale from '../exportLocale';
@@ -30,9 +29,13 @@ async function clean() {
   await fs.emptyDir(localizationFolder);
 }
 
+function encodeValue(str) {
+  return `@#@${JSON.stringify(str)}@#@`;
+}
+
 async function generateSource() {
   await fs.writeFile(path.resolve(testFolder, 'loadLocale.js'), '/* loadLocale */');
-  await fs.writeFile(path.resolve(testFolder, 'en-US.js'), dedent`
+  await fs.writeFile(path.resolve(testFolder, 'en-US.js'), `
     const obj = {
       key: 'testKey',
     };
@@ -41,6 +44,7 @@ async function generateSource() {
       modern: 'rogue',
       whisky: 'Vault',
       [obj.key]: 'testValue',
+      newline: 'containes\\nnewline',
     };
   `);
 }
@@ -74,12 +78,13 @@ describe('importLocale', () => {
     const filePath = path.resolve(testFolder, 'en-GB.js');
     expect(await fs.exists(filePath)).to.equal(true);
     const content = await fs.readFile(filePath, 'utf8');
-    expect(content.indexOf("// @key: '[modern]' @source: 'rogue'") > -1).to.equal(true);
-    expect(content.indexOf("// @key: '[whisky]' @source: 'Vault'") > -1).to.equal(true);
-    expect(content.indexOf("// @key: '[[obj.key]]' @source: 'testValue'") > -1).to.equal(true);
+    expect(content.indexOf(`// @key: ${encodeValue('modern')} @source: ${encodeValue('rogue')}`) > -1).to.equal(true);
+    expect(content.indexOf(`// @key: ${encodeValue('whisky')} @source: ${encodeValue('Vault')}`) > -1).to.equal(true);
+    expect(content.indexOf(`// @key: ${encodeValue('[obj.key]')} @source: ${encodeValue('testValue')}`) > -1).to.equal(true);
+    expect(content.indexOf(`// @key: ${encodeValue('newline')} @source: ${encodeValue('containes\nnewline')}`) > -1).to.equal(true);
   });
   it('should only import keys that exist in current source', async () => {
-    await fs.writeFile(path.resolve(testFolder, 'en-US.js'), dedent`
+    await fs.writeFile(path.resolve(testFolder, 'en-US.js'), `
       const obj = {
         key: 'testKey',
       };

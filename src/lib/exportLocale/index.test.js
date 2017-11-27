@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
-import dedent from 'dedent';
 import exportLocale from './';
 import defaultConfig from '../../defaultConfig';
 
@@ -32,11 +31,12 @@ describe('exportLocale', () => {
   describe('exported .xlf', () => {
     beforeEach(async () => {
       await generateLoader();
-      await fs.writeFile(path.resolve(testFolder, 'en-US.js'), dedent`
+      await fs.writeFile(path.resolve(testFolder, 'en-US.js'), `
         export default {
           modern: 'rogue',
           whisky: 'Vault',
           [obj.key]: 'test',
+          newline: 'contains\\nnewline',
         };
         `);
     });
@@ -63,11 +63,13 @@ describe('exportLocale', () => {
           expect(content.indexOf('Vault') > -1).to.equal(true);
           expect(content.indexOf('[obj.key]') > -1).to.equal(true);
           expect(content.indexOf('test') > -1).to.equal(true);
+          expect(content.indexOf('newline') > -1).to.equal(true);
+          expect(content.indexOf('contains\nnewline') > -1).to.equal(true);
         })
       );
     });
     it('should export only untranslated entries', async () => {
-      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), `
         export default {
           modern: 'rogue',
         };
@@ -83,9 +85,11 @@ describe('exportLocale', () => {
       expect(content.indexOf('Vault') > -1).to.equal(true);
       expect(content.indexOf('[obj.key]') > -1).to.equal(true);
       expect(content.indexOf('test') > -1).to.equal(true);
+      expect(content.indexOf('newline') > -1).to.equal(true);
+      expect(content.indexOf('contains\nnewline') > -1).to.equal(true);
     });
     it('should be able to export all entries when exportType === "full"', async () => {
-      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), `
         export default {
           modern: 'rogue',
         };
@@ -102,11 +106,14 @@ describe('exportLocale', () => {
       expect(content.indexOf('Vault') > -1).to.equal(true);
       expect(content.indexOf('[obj.key]') > -1).to.equal(true);
       expect(content.indexOf('test') > -1).to.equal(true);
+      expect(content.indexOf('newline') > -1).to.equal(true);
+      expect(content.indexOf('contains\nnewline') > -1).to.equal(true);
     });
     it('should be able to export on translated entries when exportType === "translated"', async () => {
-      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), `
         export default {
           modern: 'rogue',
+          newline: 'contains\\newline',
         };
       `);
       await exportLocale({
@@ -121,16 +128,18 @@ describe('exportLocale', () => {
       expect(content.indexOf('Vault') > -1).to.equal(false);
       expect(content.indexOf('[obj.key]') > -1).to.equal(false);
       expect(content.indexOf('test') > -1).to.equal(false);
+      expect(content.indexOf('newline') > -1).to.equal(true);
+      expect(content.indexOf('contains\nnewline') > -1).to.equal(true);
     });
     it('should export entries that have been changed since last import', async () => {
-      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), dedent`
+      await fs.writeFile(path.resolve(testFolder, 'en-GB.js'), `
         export default {
           modern: 'rogue',
           whisky: 'Wizard',
         };
 
-        // @key: '[whisky]' @source: 'Wizard'
-        // @key: '[modern]' @source: 'rogue'
+        // @key: @#@"whisky"@#@ @source: @#@"Wizard"@#@
+        // @key: @#@"modern"@#@ @source: @#@"rogue"@#@
       `);
       await exportLocale({
         sourceFolder: testFolder,
