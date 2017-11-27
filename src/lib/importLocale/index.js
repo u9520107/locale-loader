@@ -91,7 +91,7 @@ function generateMergedContent({
     return `  ${key}: ${code}${comma}`;
   }).join('\n');
   const annoString = annotations.map(a => (
-    `// @key: '[${a.key}]' @source: '${a.value}'`
+    `// @key: @#@${JSON.stringify(a.key)}@#@ @source: @#@${JSON.stringify(a.value)}@#@`
   )).join('\n');
   return `${startString}\n${dataString}\n${endString}\n${annoString}\n`;
 }
