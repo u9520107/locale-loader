@@ -11,7 +11,7 @@ const testFolder = './testData';
 
 const files = [
   'en_us.js',
-  'FR-FR.JSON',
+  'FR-FR.JS',
   'aa-AAAA-ZZ.JS',
 ];
 

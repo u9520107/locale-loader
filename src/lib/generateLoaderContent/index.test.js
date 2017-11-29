@@ -8,7 +8,7 @@ import formatLocale from '../formatLocale';
 /* global describe it */
 const files = [
   'en_us.js',
-  'FR-FR.JSON',
+  'FR-FR.JS',
   'aa-AAAA-ZZ.JS',
 ];
 
