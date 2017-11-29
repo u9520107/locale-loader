@@ -35,8 +35,11 @@ export default function generateLoaderContent(/** @type {GLCOptions} */ {
             ${padding}resolve(data.__esModule === true ? data.default : data);`;
     if (chunk) {
       code = `
-            require.ensure(['./${basename}'], (require) => {${code}
-            }, '${locale}');`;
+            if (typeof require.ensure === 'function') {
+              require.ensure(['./${basename}'], (require) => {${code}
+              }, '${locale}');
+            } else {${code}
+            }`;
     }
     let langDefaultCase = '';
     if (!usedLang[lang]) {
