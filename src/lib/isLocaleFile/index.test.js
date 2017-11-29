@@ -16,9 +16,8 @@ describe('isLocaleFile', () => {
     'aa_AA',
     'aaa_AA',
   ].forEach((fileName) => {
-    it(`should return true for ${fileName}.js or ${fileName}.json`, () => {
+    it(`should return true for ${fileName}.js`, () => {
       expect(isLocaleFile(`${fileName}.js`)).to.equal(true);
-      expect(isLocaleFile(`${fileName}.json`)).to.equal(true);
     });
   });
   [
@@ -33,9 +32,8 @@ describe('isLocaleFile', () => {
     'aa3_AAe',
     'aaaa_AA',
   ].forEach((fileName) => {
-    it(`should return false for ${fileName}.js or ${fileName}.json`, () => {
+    it(`should return false for ${fileName}.js`, () => {
       expect(isLocaleFile(`${fileName}.js`)).to.equal(false);
-      expect(isLocaleFile(`${fileName}.json`)).to.equal(false);
     });
   });
 
@@ -50,8 +48,6 @@ describe('isLocaleFile', () => {
   [
     '.js',
     '.JS',
-    '.JSON',
-    '.json',
   ].forEach((ext) => {
     it(`should return true for extension "${ext}"`, () => {
       expect(isLocaleFile(`en-US${ext}`)).to.equal(true);
