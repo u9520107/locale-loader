@@ -133,7 +133,7 @@ function getTestSources() {
 gulp.task('pre-coverage', () => {
   const testSources = getTestSources();
 
-  return gulp.src(['src/**/*.js', '!src/**/*.test.js', '!src/integration-test/**/*.js'])
+  return gulp.src(['src/lib/**/*.js', '!src/**/*.test.js'])
     .pipe(istanbul({
       includeUntested: testSources.length === 1 && testSources[0] === 'src/**/*.test.js',
       instrumenter: babelIstanbul.Instrumenter,
