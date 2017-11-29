@@ -45,6 +45,7 @@ If there is a need to not separate the bundles, the following comment can be use
 ```javascript
 /* loadLocale noChunk */
 ```
+There must be a space after '/\*' and '\*/'.
 
 I18n class
 ---
