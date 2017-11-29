@@ -42,7 +42,6 @@ export function extractAnnotations(content) {
   let match;
   /* eslint { 'no-cond-assign': 0 } */
   while ((match = annotationRegExp.exec(content)) !== null) {
-    console.log(JSON.parse(match[1]), JSON.parse(match[2]));
     annotations.set(JSON.parse(match[1]), JSON.parse(match[2]));
   }
   return {
