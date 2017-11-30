@@ -1,5 +1,6 @@
 export default {
   supportedLocales: [
+    'en-US',
     'en-GB',
     'en-CA',
     'fr-FR',
