@@ -37,6 +37,8 @@ describe('exportLocale', () => {
           whisky: 'Vault',
           [obj.key]: 'test',
           newline: 'contains\\nnewline',
+          'single-quote': 'Single Quote',
+          "double-'quote'": 'Double Quote',
         };
         `);
     });
@@ -65,6 +67,8 @@ describe('exportLocale', () => {
           expect(content.indexOf('test') > -1).to.equal(true);
           expect(content.indexOf('newline') > -1).to.equal(true);
           expect(content.indexOf('contains\nnewline') > -1).to.equal(true);
+          expect(content.indexOf('single-quote') > -1).to.equal(true);
+          expect(content.indexOf("double-'quote'") > -1).to.equal(true);
         })
       );
     });

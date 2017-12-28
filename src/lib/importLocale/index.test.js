@@ -45,6 +45,8 @@ async function generateSource() {
       whisky: 'Vault',
       [obj.key]: 'testValue',
       newline: 'containes\\nnewline',
+      'single-quote': 'Single Quote',
+      "double-'quote'": "Double Quote",
     };
   `);
 }
@@ -61,6 +63,15 @@ describe('importLocale', () => {
   });
   afterEach(clean);
   it('should import generated xlf files', async () => {
+    const xlfPath = path.resolve(localizationFolder, 'en-GB.xlf');
+    const xlfContent = await fs.readFile(xlfPath, 'utf8');
+    await fs.writeFile(xlfPath, xlfContent.replace(
+      '<target>Vault</target',
+      '<target>Changed</target>'
+    ).replace(
+      '<target>testValue</target',
+      '<target>testValueChanged</target>'
+      ));
     await importLocale(config);
     const filePath = path.resolve(testFolder, 'en-GB.js');
     expect(await fs.exists(filePath)).to.equal(true);
@@ -70,8 +81,8 @@ describe('importLocale', () => {
       json = eval(transform(content, babelOptions).code);
     }).to.not.throw();
     expect(json.modern).to.equal('rogue');
-    expect(json.whisky).to.equal('Vault');
-    expect(json.testKey).to.equal('testValue');
+    expect(json.whisky).to.equal('Changed');
+    expect(json.testKey).to.equal('testValueChanged');
   });
   it('should generate annotations', async () => {
     await importLocale(config);

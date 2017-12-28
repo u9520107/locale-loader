@@ -5,8 +5,8 @@ import isLocaleFile from '../isLocaleFile';
 import formatLocale from '../formatLocale';
 import getLoaderFiles from '../getLoaderFiles';
 
-export function parseLine(tokens, startingIdx) {
-  let idx = startingIdx;
+export function parseLine(tokens, startIdx) {
+  let idx = startIdx;
   let token = tokens[idx];
   const keyArray = [];
   do {
@@ -17,6 +17,8 @@ export function parseLine(tokens, startingIdx) {
   const valueArray = [];
   idx += 1;
   token = tokens[idx];
+  const valueStart = idx;
+  let valueEnd;
   do {
     if (
       token.type === tokTypes.backQuote
@@ -25,6 +27,7 @@ export function parseLine(tokens, startingIdx) {
     } else {
       valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     }
+    valueEnd = idx;
     idx += 1;
     token = tokens[idx];
   } while (token.type !== tokTypes.comma && token.type !== tokTypes.braceR);
@@ -32,6 +35,9 @@ export function parseLine(tokens, startingIdx) {
   return {
     key: keyArray.join(''),
     value,
+    startIdx,
+    valueStart,
+    valueEnd,
     endIdx: idx,
   };
 }
@@ -55,38 +61,49 @@ export async function extractData(localeFile) {
     content,
     annotations,
   } = extractAnnotations(await fs.readFile(localeFile, 'utf8'));
-  const parsed = parse(content, { sourceType: 'module' });
+  const ast = parse(content, { sourceType: 'module' });
   let idx = 0;
-  const len = parsed.tokens.length;
+  const len = ast.tokens.length;
   let capturing = false;
   const data = {};
-  let dataStartIndex = null;
-  let dataEndIndex = null;
+  // let dataStartIndex = null;
+  // let dataEndIndex = null;
   while (idx < len) {
-    const token = parsed.tokens[idx];
+    const token = ast.tokens[idx];
     if (
       token.type === tokTypes._export &&
-      parsed.tokens[idx + 1].type === tokTypes._default &&
-      parsed.tokens[idx + 2].type === tokTypes.braceL
+      ast.tokens[idx + 1].type === tokTypes._default &&
+      ast.tokens[idx + 2].type === tokTypes.braceL
     ) {
-      dataStartIndex = parsed.tokens[idx + 2].end;
+      // dataStartIndex = ast.tokens[idx + 2].end;
       capturing = true;
       idx += 3;
     } else if (capturing) {
       if (token.type === tokTypes.braceR) {
-        dataEndIndex = token.start;
+        // dataEndIndex = token.start;
         break;
       } else {
-        const { key, value, endIdx } = parseLine(parsed.tokens, idx);
+        const {
+          key,
+          value,
+          startIdx,
+          endIdx,
+          valueStart,
+          valueEnd,
+        } = parseLine(ast.tokens, idx);
         data[key] = {
           key,
           value,
+          valueStart,
+          valueEnd,
+          startIdx,
+          endIdx,
           source: annotations.get(key),
         };
-        if (parsed.tokens[endIdx].type !== tokTypes.braceR) {
+        if (ast.tokens[endIdx].type !== tokTypes.braceR) {
           idx = endIdx + 1;
         } else {
-          dataEndIndex = parsed.tokens[endIdx].start;
+          // dataEndIndex = ast.tokens[endIdx].start;
           break;
         }
       }
@@ -97,8 +114,9 @@ export async function extractData(localeFile) {
   return {
     content,
     data,
-    dataStartIndex,
-    dataEndIndex,
+    ast,
+    // dataStartIndex,
+    // dataEndIndex,
   };
 }
 

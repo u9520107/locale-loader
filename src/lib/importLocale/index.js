@@ -1,6 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import xml from 'xml-js';
+import { parse } from 'babylon';
+import generate from 'babel-generator';
 import escodegen from 'escodegen';
 import chalk from 'chalk';
 
@@ -70,30 +72,36 @@ async function readXlf({
 
 function generateMergedContent({
   content,
-  dataStartIndex,
-  dataEndIndex,
+  ast,
   mergedData,
-  trailingComma,
   annotations,
 }) {
-  const startString = content.substring(0, dataStartIndex);
-  const endString = content.substring(dataEndIndex);
-  const keys = Object.keys(mergedData);
-  const lastIdx = keys.length - 1;
-  const dataString = keys.map((key, idx) => {
-    const comma = (idx < lastIdx || trailingComma) ?
-      ',' :
-      '';
-    const code = escodegen.generate({
-      type: 'Literal',
-      value: mergedData[key].value,
-    });
-    return `  ${key}: ${code}${comma}`;
-  }).join('\n');
+  const entries = Object.keys(mergedData)
+      .map(key => mergedData[key]).sort((a, b) => a.valueStart - b.valueStart);
+  let offset = 0;
+  let output = content;
+  entries.forEach((item) => {
+    if (item.output) {
+      const valueStart = ast.tokens[item.valueStart].start + offset;
+      const valueEnd = ast.tokens[item.valueEnd].end + offset;
+      const code = escodegen.generate({
+        type: 'Literal',
+        value: item.value,
+      });
+      output = `${output.substring(0, valueStart)}${code}${output.substring(valueEnd)}`;
+      offset += code.length - (valueEnd - valueStart);
+    } else {
+      const startIdx = ast.tokens[item.startIdx].start + offset;
+      const endIdx = ast.tokens[item.endIdx].end + offset;
+      output = `${output.substring(0, startIdx)}${output.substring(endIdx)}`;
+      offset -= endIdx - startIdx;
+    }
+  });
   const annoString = annotations.map(a => (
     `// @key: @#@${JSON.stringify(a.key)}@#@ @source: @#@${JSON.stringify(a.value)}@#@`
   )).join('\n');
-  return `${startString}\n${dataString}\n${endString}\n${annoString}\n`;
+
+  return `${output}\n${annoString}\n`;
 }
 
 async function mergeToFiles({
@@ -101,7 +109,6 @@ async function mergeToFiles({
   translatedData,
   sourceFolder,
   sourceLocale,
-  trailingComma,
 }) {
   await Promise.all(Object.keys(translatedData).map(async (locale) => {
     await Promise.all(Object.keys(translatedData[locale]).map(async (fileName) => {
@@ -122,10 +129,27 @@ async function mergeToFiles({
 
       const translated = translatedData[locale][fileName];
       const mergedData = {};
+
+      Object.keys(sourceData).forEach((key) => {
+        mergedData[key] = {
+          ...sourceData[key],
+        };
+      });
+
       // convert original values into string literals
       Object.keys(original).forEach((key) => {
+        if (!sourceData[key]) {
+          console.log(`[import-locale] ${chalk.red('{Delete}')} Key: '[${key}]', Reason: Source no longer exist.`);
+          return;
+        }
+        if (!sourceData[key].value !== original[key].source) {
+          console.log(`[import-locale] ${chalk.red('{Delete}')} Key: '[${key}]', Reason: Source value changed.`);
+          return;
+        }
         mergedData[key] = {
+          ...mergedData[key],
           ...original[key],
+          output: true,
         };
       });
       Object.keys(translated).forEach((key) => {
@@ -138,15 +162,17 @@ async function mergeToFiles({
           return;
         }
         mergedData[key] = {
+          ...mergedData[key],
           ...translated[key],
+          output: true,
         };
       });
       const mergedContent = generateMergedContent({
         ...rawData[folderPath].files[sourceLocale],
         mergedData,
         annotations,
-        trailingComma,
       });
+      console.log(mergedContent);
       await fs.writeFile(path.resolve(sourceFolder, fileName), mergedContent);
     }));
   }));
@@ -157,7 +183,6 @@ async function importLocale({
   localizationFolder = defaultConfig.localizationFolder,
   sourceLocale = defaultConfig.sourceLocale,
   supportedLocales = defaultConfig.supportedLocales,
-  trailingComma = true,
 } = {}) {
   const rawData = await getRawData({
     sourceFolder,
@@ -173,7 +198,6 @@ async function importLocale({
     translatedData,
     sourceFolder,
     sourceLocale,
-    trailingComma,
   });
 }
 
