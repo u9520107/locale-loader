@@ -29,6 +29,7 @@ export default {
     [constants.fetchError]: 'Fetch Error',
     icuCompliant: 'Greetings, {name}!',
     handleEscapedBraces: 'Escape braces with single quote: \'{foo}\'',
+    'complex-keys': 'Support using quoted property names',
 };
 ```
 
@@ -92,3 +93,32 @@ gulp.src('./src')
     .pipe(babel(...babelConfig))
     .pipe(gulp.dest('./build'));
 ```
+
+Export to Xlf
+---
+
+The exportLocale function can be used to generate xlf files.
+
+```javascript
+import ExportLocale from 'locale-loader/exportLocale';
+
+const config = {
+    sourceLocale: 'en-US', // the default locale with original strings
+    supportedLocales: ['en-US', 'fr-FR', 'ja-JP'], // the array of locales to support
+    sourceFolder: 'src', // export locale will use 'src/**/*.js' glob to search for loaders
+    localizationFolder: 'localization', // exported files will be saved to here
+    exportType: 'diff', // determines what is exported
+};
+
+exportLocale(config).then(() => {
+    console.log('.xlf generated to `cwd()/localization/`');
+});
+
+```
+
+**Export Types**
+
+1. 'diff': Diff will only export entries that have not been translated, or have been modified since last translation. This is the default mode.
+2. 'full': This will export everything.
+3. 'translated': This will only export translated entries.
+
