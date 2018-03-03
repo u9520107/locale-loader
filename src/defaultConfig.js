@@ -3,6 +3,7 @@ export default {
     'en-US',
     'en-GB',
     'en-CA',
+    'en-AU',
     'fr-FR',
     'fr-CA',
     'de-DE',
