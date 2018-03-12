@@ -38,14 +38,18 @@ export default class I18n {
     this._loadLocale = loadLocale;
     this._cache = {};
     RUNTIME.instances.add(this);
-    this._load(DEFAULT_LOCALE);
-    this._load(RUNTIME.locale);
+    this.pInitiate = Promise.all([this._load(DEFAULT_LOCALE), this._load(RUNTIME.locale)]);
+    this.initiated = false;
+    this.pInitiate.then(() => {
+      this.initiated = true;
+    });
   }
+
   async _load(locale) {
     if (locale !== PSEUDO_LOCALE && !this._cache[locale]) {
       let data;
       try {
-        data = await (async () => this._loadLocale(locale))();
+        data = await (async() => this._loadLocale(locale))();
       } catch (error) {
         /* ignore error */
         data = {};
@@ -53,6 +57,7 @@ export default class I18n {
       this._cache[locale] = data;
     }
   }
+
   _getString(key, locale) {
     if (
       this._cache[locale] &&
@@ -68,7 +73,16 @@ export default class I18n {
     }
     return key;
   }
+
+  async asyncGetString(key, locale = RUNTIME.locale) {
+    await this.pInitiate;
+    return this.getString(key, locale);
+  }
+
   getString(key, locale = RUNTIME.locale) {
+    if (!this.initiated) {
+      throw new Error("The construction works hasn't finished yet.");
+    }
     if (locale === PSEUDO_LOCALE) {
       return toPseudoString(this._getString(key, DEFAULT_LOCALE));
     }
@@ -79,9 +93,10 @@ export default class I18n {
   get currentLocale() {
     return RUNTIME.locale;
   }
+
   // eslint-disable-next-line class-methods-use-this
-  get setLocale() {
-    return setLocale;
+  setLocale(...args) {
+    return this.pInitiate.then(() => setLocale(...args));
   }
 
   static get currentLocale() {
