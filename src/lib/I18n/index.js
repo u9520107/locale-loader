@@ -4,6 +4,7 @@ export const DEFAULT_LOCALE = 'en-US';
 export const PSEUDO_LOCALE = 'en-ZZ';
 export const RUNTIME = {
   locale: DEFAULT_LOCALE,
+  defaultLocale: DEFAULT_LOCALE,
   instances: new Set(),
 };
 
@@ -16,7 +17,7 @@ export const RUNTIME = {
 async function setLocale(locale) {
   RUNTIME.locale = locale;
   for (const i of RUNTIME.instances) {
-    await i._load(locale);
+    await i.load();
   }
 }
 
@@ -38,8 +39,6 @@ export default class I18n {
     this._loadLocale = loadLocale;
     this._cache = {};
     RUNTIME.instances.add(this);
-    this._load(DEFAULT_LOCALE);
-    this._load(RUNTIME.locale);
   }
   async _load(locale) {
     if (locale !== PSEUDO_LOCALE && !this._cache[locale]) {
@@ -53,6 +52,10 @@ export default class I18n {
       this._cache[locale] = data;
     }
   }
+  async load() {
+    await this._load(RUNTIME.defaultLocale);
+    await this._load(RUNTIME.locale);
+  }
   _getString(key, locale) {
     if (
       this._cache[locale] &&
@@ -61,16 +64,16 @@ export default class I18n {
       return this._cache[locale][key];
     }
     if (
-      this._cache[DEFAULT_LOCALE] &&
-      this._cache[DEFAULT_LOCALE]::Object.prototype.hasOwnProperty(key)
+      this._cache[RUNTIME.defaultLocale] &&
+      this._cache[RUNTIME.defaultLocale]::Object.prototype.hasOwnProperty(key)
     ) {
-      return this._cache[DEFAULT_LOCALE][key];
+      return this._cache[RUNTIME.defaultLocale][key];
     }
     return key;
   }
   getString(key, locale = RUNTIME.locale) {
     if (locale === PSEUDO_LOCALE) {
-      return toPseudoString(this._getString(key, DEFAULT_LOCALE));
+      return toPseudoString(this._getString(key, RUNTIME.defaultLocale));
     }
     return this._getString(key, locale);
   }
@@ -90,5 +93,9 @@ export default class I18n {
 
   static get setLocale() {
     return setLocale;
+  }
+
+  static setDefaultLocale(locale) {
+    RUNTIME.defaultLocale = locale;
   }
 }
