@@ -39,6 +39,7 @@ export default class I18n {
     this._loadLocale = loadLocale;
     this._cache = {};
     RUNTIME.instances.add(this);
+    this.load();
   }
   async _load(locale) {
     if (locale !== PSEUDO_LOCALE && !this._cache[locale]) {
