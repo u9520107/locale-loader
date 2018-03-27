@@ -15,11 +15,11 @@ export function parseLine(tokens, startIdx) {
     token = tokens[idx];
   } while (token.type !== tokTypes.colon);
   const valueArray = [];
-  idx += 1;
-  token = tokens[idx];
-  const valueStart = idx;
+  const valueStart = idx + 1;
   let valueEnd;
   do {
+    idx += 1;
+    token = tokens[idx];
     if (
       token.type === tokTypes.backQuote
     ) {
@@ -28,9 +28,7 @@ export function parseLine(tokens, startIdx) {
       valueArray.push(typeof token.value !== 'undefined' ? token.value : token.type.label);
     }
     valueEnd = idx;
-    idx += 1;
-    token = tokens[idx];
-  } while (token.type !== tokTypes.comma && token.type !== tokTypes.braceR);
+  } while (tokens[idx + 1].type !== tokTypes.comma && tokens[idx + 1].type !== tokTypes.braceR);
   const value = valueArray.join('');
   return {
     key: keyArray.join(''),
@@ -38,7 +36,7 @@ export function parseLine(tokens, startIdx) {
     startIdx,
     valueStart,
     valueEnd,
-    endIdx: idx,
+    endIdx: tokens[idx + 1].type === tokTypes.comma ? idx + 1 : idx,
   };
 }
 
@@ -66,8 +64,6 @@ export async function extractData(localeFile) {
   const len = ast.tokens.length;
   let capturing = false;
   const data = {};
-  // let dataStartIndex = null;
-  // let dataEndIndex = null;
   while (idx < len) {
     const token = ast.tokens[idx];
     if (
@@ -75,12 +71,10 @@ export async function extractData(localeFile) {
       ast.tokens[idx + 1].type === tokTypes._default &&
       ast.tokens[idx + 2].type === tokTypes.braceL
     ) {
-      // dataStartIndex = ast.tokens[idx + 2].end;
       capturing = true;
       idx += 3;
     } else if (capturing) {
       if (token.type === tokTypes.braceR) {
-        // dataEndIndex = token.start;
         break;
       } else {
         const {
@@ -103,7 +97,6 @@ export async function extractData(localeFile) {
         if (ast.tokens[endIdx].type !== tokTypes.braceR) {
           idx = endIdx + 1;
         } else {
-          // dataEndIndex = ast.tokens[endIdx].start;
           break;
         }
       }
@@ -115,8 +108,6 @@ export async function extractData(localeFile) {
     content,
     data,
     ast,
-    // dataStartIndex,
-    // dataEndIndex,
   };
 }
 
