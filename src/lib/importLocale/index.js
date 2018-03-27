@@ -77,7 +77,7 @@ function generateMergedContent({
   annotations,
 }) {
   const entries = Object.keys(mergedData)
-      .map(key => mergedData[key]).sort((a, b) => a.valueStart - b.valueStart);
+    .map(key => mergedData[key]).sort((a, b) => a.valueStart - b.valueStart);
   let offset = 0;
   let output = content;
   entries.forEach((item) => {
@@ -142,7 +142,7 @@ async function mergeToFiles({
           console.log(`[import-locale] ${chalk.red('{Delete}')} Key: '[${key}]', Reason: Source no longer exist.`);
           return;
         }
-        if (!sourceData[key].value !== original[key].source) {
+        if (sourceData[key].value !== original[key].source) {
           console.log(`[import-locale] ${chalk.red('{Delete}')} Key: '[${key}]', Reason: Source value changed.`);
           return;
         }
@@ -172,7 +172,6 @@ async function mergeToFiles({
         mergedData,
         annotations,
       });
-      console.log(mergedContent);
       await fs.writeFile(path.resolve(sourceFolder, fileName), mergedContent);
     }));
   }));

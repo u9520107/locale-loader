@@ -138,4 +138,29 @@ describe('importLocale', () => {
     expect(json.whisky).to.equal(undefined);
     expect(json.testKey).to.equal(undefined);
   });
+  it('it should work for files without trailing comma', async () => {
+    await fs.writeFile(path.resolve(testFolder, 'en-US.js'), `
+      const obj = {
+        key: 'testKey',
+      };
+
+      export default {
+        modern: 'rogue',
+        whisky: 'Vault',
+        [obj.key]: 'testValue',
+        newline: 'containes\\nnewline',
+        'single-quote': 'Single Quote',
+        "double-'quote'": "Double Quote",
+        newKey: 'newKey'
+      };
+    `);
+    await exportLocale(config);
+    await importLocale(config);
+    const filePath = path.resolve(testFolder, 'en-GB.js');
+    expect(await fs.exists(filePath)).to.equal(true);
+    const content = await fs.readFile(filePath, 'utf8');
+    expect(() => {
+      const json = eval(transform(content, babelOptions).code);
+    }).to.not.throw();
+  });
 });
